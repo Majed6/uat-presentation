@@ -1,40 +1,300 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+    <title>UAT in agile services</title>
 
-		<link rel="stylesheet" href="dist/reset.css">
-		<link rel="stylesheet" href="dist/reveal.css">
-		<link rel="stylesheet" href="dist/theme/black.css">
+    <link rel="stylesheet" href="dist/reset.css">
+    <link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/black.css">
 
-		<!-- Theme used for syntax highlighted code -->
-		<link rel="stylesheet" href="plugin/highlight/monokai.css">
-	</head>
-	<body>
-		<div class="reveal">
-			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
-			</div>
-		</div>
+    <!-- Theme used for syntax highlighted code -->
+    <link rel="stylesheet" href="plugin/highlight/monokai.css">
+</head>
+<body>
+<div class="reveal">
+    <div class="slides">
+        <section>
+            <h2>UAT environment in agile services</h2>
+        </section>
+        <section>
+            <section>
+                UAT is counterproductive at best and here is why.
+            </section>
+            <section>
+                <p>Testing features in isolation is a myth.</p>
+                <p class="fragment">That is why UAT should represent a full state of the service. A complete production
+                    to be state</p>
+                <aside class="notes">
+                    <p>
+                        The end user gets to experience the whole system not a single function.
+                        That means features must interact with each other.
+                        Cancel order wouldn't be useful without create order, which wouldn't be that useful without
+                        pay and refund order.
+                        A change in any of them will inevitably affect the others.
+                        That is why we have regression testing.
+                    </p>
+                    ------
+                    <p>
+                        Some would argue that it is, and it should be.
+                    </p>
+                </aside>
+            </section>
+            <section>
+                <ol>
+                    In our system, the time to market gets as low as few hours.
+                    <span class="fragment"> Entailing:</span>
+                    <li class="fragment">
+                        Have the UAT always on the bleeding edge.
+                    </li>
+                    <li class="fragment">
+                        Have the UAT on an outdated state.
+                    </li>
+                </ol>
+                <aside class="notes">
+                    <p>from conception to production.</p>
+                    ----
+                    <p>To keep that time to market we have one of two options:</p>
+                    ----
+                    <p>That eliminates the need for an intermediary state UAT. It would be enough to have the staging
+                        state.</p>
+                    ----
+                    <p>Not sure how useful is that.</p>
+                </aside>
+            </section>
+            <section>
+                The more states you want to maintain the more environments you need the more states you want to maintain
+            </section>
+            <section>
+                Imagine the following scenario:
+                <ol>
+                    <li>A system in production with an initial feature C1</li>
+                    <li>A feature to be developed called C2</li>
+                    <li>A feature to be developed called C3</li>
+                    <li>A bugfix caused by C2 to be developed called C4</li>
+                </ol>
+            </section>
+            <section>
+                In the next two slides we're going to explore a workflow with 3 environments and 3 states and another with 2 environments with a strict 2 states workflow.
+            </section>
+            <section>
+                <iframe height="700"  width="1000" src="https://learngitbranching.js.org/?NODEMO"></iframe>
+                <aside class="notes">
+                    <ol>
+                        <li>
+                            git checkout -b staging
+                            <ul>
+                                <li>Create an environment</li>
+                            </ul>
+                        </li>
+                        <li>
+                            git commit
+                            <ul>
+                                <li>Make a new feature call it C2</li>
+                            </ul>
+                        </li>
+                        <li>
+                            git branch uat
+                            <ul>
+                                <li>Create an environment UAT for C2</li>
+                            </ul>
+                        </li>
+                        <li>
+                            git commit
+                            <ul>
+                                <li>Make a new feature call it C3</li>
+                            </ul>
+                        </li>
+                        <li>
+                            git checkout main
+                            <ul>
+                                <li>C3 must be deployed to production</li>
+                            </ul>
+                        </li>
+                        <li>
+                            git cherry-pick c3
+                            <ul>
+                                <li>Let's redo c3 for production and call it c3'</li>
+                                <li>As you can see we have an un-tested state C1C3'</li>
+                            </ul>
+                        </li>
+                        <li>
+                            git checkout staging
+                            <ul>
+                                <li>A bug in UAT has been found. Let's fix it in staging</li>
+                            </ul>
+                        </li>
+                        <li>
+                            git commit
+                            <ul>
+                                <li>Call the fix C4</li>
+                            </ul>
+                        </li>
+                        <li>
+                            git checkout uat
+                            <ul>
+                                <li>Let's redo the fix for the UAT</li>
+                            </ul>
+                        </li>
+                        <li>
+                            git cherry-pick c4
+                            <ul>
+                                <li>And call it c4'</li>
+                                <li>That fix might not actually work because the testing was done on C1C2C3C4 and as you can see we have C1C2C4' which is not the same</li>
+                                <li>Repeat for every intermediary state you want to maintain</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </aside>
+            </section>
+            <section>
 
-		<script src="dist/reveal.js"></script>
-		<script src="plugin/notes/notes.js"></script>
-		<script src="plugin/markdown/markdown.js"></script>
-		<script src="plugin/highlight/highlight.js"></script>
-		<script>
-			// More info about initialization & config:
-			// - https://revealjs.com/initialization/
-			// - https://revealjs.com/config/
-			Reveal.initialize({
-				hash: true,
+                <iframe height="700"  width="1000" src="https://learngitbranching.js.org/?NODEMO"></iframe>
+                <aside class="notes">
+                    <ol>
+                        <li>
+                            git checkout -b staging
+                            <ul>
+                                <li>Create an environment</li>
+                            </ul>
+                        </li>
+                        <li>
+                            git commit
+                            <ul>
+                                <li>Make a new feature call it C2</li>
+                            </ul>
+                        </li>
+                        <li>
+                            git commit
+                            <ul>
+                                <li>Make a new feature call it C3</li>
+                            </ul>
+                        </li>
+                        <li>
+                            git commit
+                            <ul>
+                                <li>A bug in C2 has been found. Let's fix it in staging and call the fix C4</li>
+                            </ul>
+                        </li>
+                        <li>
+                            git checkout main
+                            <ul>
+                                <li>Let's deploy the changes to production.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            git rebase staging main
+                            <ul>
+                                <li>As you can see C1C2C3C4 was already tested and should be safe to deploy</li>
+                                <li>This might not be an achievable workflow since it would require extreme discipline from both the developing and business parties. And may not feasible, given the nature of the actual business party</li>
+                                <li>What we have in eContracting is 2 environments with 3 states btw with 3rd state being mostly covered by automated tests and frequent release.</li>
+                                <li>The point here is the more states you want to maintain the more environments you need the more states you want to maintain</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </aside>
+            </section>
+            <section>
+                <ul>
+                    To sum up
+                    <li>A bleeding edge UAT is the equivalent of the staging environment</li>
+                    <li>A saved state UAT gives us a false sense of safety and introduce the need for more environments which in turn introduces the need for more saved states</li>
+                </ul>
+            </section>
+        </section>
+        <section>
+            Wants
+        </section>
+        <section>
+            <section>
+                I have an important demo and the client want a live demo
+            </section>
+            <section>
+                They asked for a live demo for a reason. Ask them about that reason.
+                <ul class="r-fit-text">
+                    <li class="fragment">
+                        If they want to make sure that the system is working. Then presenting anything that is not actually to be puts you in a position of being called out later when the system become.
+                    </li>
+                    <li class="fragment">
+                        If they want it because it's interactive. Then a mockup serves them better because it allows for going back and forth in between states of the demo and discussing the details of each state.
+                    </li>
+                    <li class="fragment">
+                        If they want it for the show factor. Even a production demo might put the show in jeopardy when an integration goes bust. A recording that clearly show the time, the date and the URL of the recording will make sure that the show goes smoothly. Saving face for the presenter and time for the audience.
+                    </li>
+                </ul>
+            </section>
+        </section>
+        <section>
+            <section>
+                I want to test the system without the others ruining my test cases
+            </section>
+            <section>
+                Create dedicated accounts with passwords that you only know
+            </section>
+        </section>
+        <section>
+            <section>
+                I want to be sure that a certain feature is releasable
+            </section>
+            <section>
+                <ul>
+                    To be certain:
+                    <li class="fragment">Test the to be. A Saved state is a "was".</li>
+                    <li class="fragment">Continuously test. No amount of regression testing could replace continuous testing. Because regression testing is holistic in nature. On the other hand continuous testing gives you plenty of time to take a look at each change. They complement each other. One isn't a replacement for the other.</li>
+                    <li class="fragment">Promote a healthy system at all times. A saved state creates buffers of changes that hasn't been looked at yet. Quality should be baked in not an afterthought. A system should be functional at any given moment</li>
+                </ul>
+            </section>
+        </section>
+        <section>
+            <section>
+                I want to release some features before others
+            </section>
+            <section>
+                I don't believe that this is problem for our system. We've already developed internal policies that allow for selective deployment without compromising quality as much.
+            </section>
+        </section>
+        <section>
+            <section>
+                I have an automated E2E test suite that I want to run without ruining the environment
+            </section>
+            <section>
+                <ul>
+                    <li>
+                        Awesome! It's possible to make automated E2E test suite an integral part of the development cycle. Let's have a discussion about that at some point.
+                    </li>
+                    <li class="fragment">
+                        If you're trying to preserve the states of the accounts you got, create dedicated accounts for your E2E test suite.
+                    </li>
+                    <li class="fragment">
+                        If you're trying to preserve the system performance. Let's have a set down and understand together the amount of system resources that need to be scaled up to meet the spike on demand.
+                    </li>
+                </ul>
+            </section>
+        </section>
+        <section>
+            More wants? Let's hear them.
+        </section>
+    </div>
+</div>
 
-				// Learn about plugins: https://revealjs.com/plugins/
-				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
-			});
-		</script>
-	</body>
+<script src="dist/reveal.js"></script>
+<script src="plugin/notes/notes.js"></script>
+<script src="plugin/markdown/markdown.js"></script>
+<script src="plugin/highlight/highlight.js"></script>
+<script>
+    Reveal.configure({
+        keyboard: {
+            219: () => Reveal.initialize({showNotes: true}),
+            221: () => Reveal.initialize({showNotes: false}),
+        }
+    });
+    Reveal.initialize({
+        hash: true,
+        // Learn about plugins: https://revealjs.com/plugins/
+        plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+    });
+</script>
+</body>
 </html>
